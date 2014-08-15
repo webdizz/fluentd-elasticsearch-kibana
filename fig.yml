@@ -1,0 +1,41 @@
+kibana:
+  image: webdizz/kibana
+  ports:
+    - 8087:80
+  environment:
+    - ROOT_PASS=123456
+  volumes:
+    - kibana/config.js:/usr/share/kibana/config.js
+  links: 
+    - elasticsearch:elasticsearch
+  hostname: kibana
+
+elasticsearch:
+  image: webdizz/elasticsearch
+  hostname: elasticsearch
+  ports: 
+    - 9200
+    - 9300
+    - 9301
+    - 9302
+    - 9303
+    - 9304
+    - 9305
+
+nginxLogShipper:
+  image: webdizz/fluentd
+  links:
+    - receiver:receiver
+  volumes:
+    - fluent_nginx_shipper.conf:/etc/fluent/fluent.conf 
+  volumes_from:
+    - kibana
+
+receiver:
+  image: webdizz/fluentd
+  links:
+    - elasticsearch:elasticsearch
+  volumes:
+    - fluent_receiver.conf:/etc/fluent/fluent.conf 
+
+
